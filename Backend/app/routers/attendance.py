@@ -208,8 +208,7 @@ def get_group_sections(
         LEFT JOIN daily_attendance da
             ON da.student_id = st.student_id
 
-        WHERE s.group_id = :group_id
-          AND s.status = TRUE
+        WHERE s.status = TRUE
 
         GROUP BY
             s.section_id,
@@ -268,12 +267,14 @@ def get_group_sections(
 
 
 
+
 @router.get("/sections/{section_id}/students",
 response_model=StudentAttendanceListResponse,)
 def get_section_students(
     section_id: int,
     campus_id: int = Query(...),
     academic_year_id: int = Query(...),
+    group_id: int | None = Query(None),
     target_date: date | None = Query(None),
     db: Session = Depends(get_db),
 ):
@@ -334,6 +335,7 @@ END AS leave_reason
         WHERE st.section_id = :section_id
           AND st.campus_id = :campus_id
           AND st.academic_year_id = :academic_year_id
+          AND (:group_id IS NULL OR st.group_id = :group_id)
           AND st.status = TRUE
 
         ORDER BY
@@ -346,6 +348,7 @@ END AS leave_reason
             "section_id": section_id,
             "campus_id": campus_id,
             "academic_year_id": academic_year_id,
+            "group_id": group_id,
             "target_date": target_date,
         },
     ).mappings().all()

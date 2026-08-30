@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    border-color: theme('colors.ink.200');
+  }
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    font-family: theme('fontFamily.sans');
+    background-color: #f4f6fb;
+    color: theme('colors.ink.900');
+    font-feature-settings: 'cv11', 'ss01';
+  }
+  ::selection {
+    background-color: theme('colors.brand.200');
+    color: theme('colors.brand.950');
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl bg-white border border-ink-200/80 shadow-card;
+  }
+  .card-hover {
+    @apply transition-all duration-200 hover:shadow-cardHover hover:border-ink-300/80;
+  }
+  .section-title {
+    @apply text-base font-bold text-ink-900 tracking-tight;
+  }
+  .section-sub {
+    @apply text-xs font-medium text-ink-500;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-ink-600 hover:bg-ink-100 hover:text-ink-900 transition-colors;
+  }
+  .table-row-hover {
+    @apply transition-colors hover:bg-ink-50;
+  }
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: theme('colors.ink.300') transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: theme('colors.ink.300');
+    border-radius: 9999px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .grid-bg {
+    background-image:
+      linear-gradient(to right, rgba(100, 112, 145, 0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(100, 112, 145, 0.06) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+}

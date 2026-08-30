@@ -196,19 +196,22 @@ def get_progress_analytics(
 
         results AS (
             SELECT
-                student_id,
-                AVG(percentage) AS average_percentage
+                r.student_id,
+                AVG(r.percentage) AS average_percentage
             FROM jclg_result r
             JOIN jclg_exam e
                 ON e.exam_id = r.exam_id
             WHERE e.campus_id = :campus_id
               AND e.academic_year_id = :academic_year_id
               AND e.status = TRUE
-            GROUP BY student_id
+            GROUP BY r.student_id
         )
 
         SELECT
-            a.student_id,
+            s.student_id,
+            s.roll_number,
+            s.first_name || ' ' || COALESCE(s.last_name, '') AS student_name,
+            g.group_name,
 
             CASE
                 WHEN a.total_count > 0
@@ -227,10 +230,17 @@ def get_progress_analytics(
                 2
             ) AS result_percentage
 
-        FROM attendance a
-
+        FROM jclg_student s
+        JOIN jclg_group g
+            ON g.group_id = s.group_id
+        LEFT JOIN attendance a
+            ON a.student_id = s.student_id
         LEFT JOIN results r
-            ON r.student_id = a.student_id
+            ON r.student_id = s.student_id
+        WHERE s.campus_id = :campus_id
+          AND s.academic_year_id = :academic_year_id
+          AND s.status = TRUE
+        ORDER BY s.student_id;
     """)
 
     ap_rows = (
@@ -266,6 +276,10 @@ def get_progress_analytics(
         )
 
         scatter.append({
+            "student_id": row["student_id"],
+            "student_name": row["student_name"],
+            "roll_number": row["roll_number"],
+            "group_name": row["group_name"],
             "attendance_percentage": attendance,
             "result_percentage": result,
         })
@@ -334,7 +348,6 @@ def get_progress_analytics(
         FROM jclg_attendance
 
         WHERE academic_year_id = :academic_year_id
-          AND campus_id = :campus_id
 
         GROUP BY student_id
     ),
@@ -441,6 +454,8 @@ def get_progress_analytics(
         ON syl.group_id = g.group_id
 
     WHERE g.status = TRUE
+      AND s.campus_id = :campus_id
+      AND s.academic_year_id = :academic_year_id
 
     GROUP BY
         g.group_id,
